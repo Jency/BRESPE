@@ -23,9 +23,9 @@ command: **>>cd client** and then **>>npm run start**
 ### Configure more in the `react` box
 1. replace with `truffle-config.js` file to set up development model
 2. add functions of `file save` and `SHA` hash calculation: 
-3  download `FileSaver` from https://github.com/eligrey/FileSaver.js and then unzip it into `node_modulers` directory under your `client` directory.
-4  downlaod `js-sha3` from https://github.com/emn178/js-sha3 and then unzip it into `node_modulers` directory under your `client` directory.
-5  add denpendicies: replace with `package.json` file in your `client` directory
+2.1.  download `FileSaver` from https://github.com/eligrey/FileSaver.js and then unzip it into `node_modulers` directory under your `client` directory.
+2.2.  downlaod `js-sha3` from https://github.com/emn178/js-sha3 and then unzip it into `node_modulers` directory under your `client` directory.
+2.3.  add denpendicies: replace with `package.json` file in your `client` directory
 ### Add codes into the `react` box
 1. add smart contracts codes: replace with `SimpleStorage.sol` file under the `contracts` directory
 2. design user interface codes: replace with the whole `src` folder under the `client` directory
