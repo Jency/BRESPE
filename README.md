@@ -5,7 +5,7 @@ This demo contributes healthcare data secure sharing in privacy protection using
 1. Ensure you configures environment to run `Ethereum` 
 2. check geth client `Ganache-cli` or `testrpc`, if no client, see step 3
 3. install `testrpc`: **>>npm install -g ethereumjs-testrpc**
-4. alternative step2 with install `Ganache-cli`: **>>npm install -g ganache-cli**
+4. alternative step3 with install `Ganache-cli`: **>>npm install -g ganache-cli**
 5. Run testRPC/ganache-cli to connect Ethereum in a terminal: **>>testrpc** or **>>ganache-cli**
 ### Installation `react` box into your empty directory or see steps from https://www.trufflesuite.com/boxes/react or https://github.com/truffle-box/react-box
 1. First run the second terminal and ensure you are in a new and empty directory.
