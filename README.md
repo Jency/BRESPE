@@ -22,14 +22,14 @@ command: **>>cd client** and then **>>npm run start**
 ### Configure more in the `react` box
 1. replace with `truffle-config.js` file to set up development model
 2. add functions of `file save` and `SHA` hash calculation: 
-2.1. download `FileSaver` from https://github.com/eligrey/FileSaver.js and then unzip it into `node_modulers` directory under your `client` directory.
-2.2  downlaod `js-sha3` from https://github.com/emn178/js-sha3 and then unzip it into `node_modulers` directory under your `client` directory.
-2.3 add denpendicies: replace with `package.json` file in your `client` directory
+3  download `FileSaver` from https://github.com/eligrey/FileSaver.js and then unzip it into `node_modulers` directory under your `client` directory.
+4  downlaod `js-sha3` from https://github.com/emn178/js-sha3 and then unzip it into `node_modulers` directory under your `client` directory.
+5  add denpendicies: replace with `package.json` file in your `client` directory
 ### Add codes into the `react` box
 1. add smart contracts codes: replace with `SimpleStorage.sol` file under the `contracts` directory
 2. design user interface codes: replace with the whole `src` folder under the `client` directory
 ### Test
 1. run testrpc or ganache-cli in a terminal
-2. run the developmenet model to compile and migrate smart contracts in the second terminal: **>>truffle compile** and **>>truffle migrate**
-3. run user interface in the third terminal: **>>cd client**; **>>npm run start**
+2. run the developmenet model to compile and migrate smart contracts in the second terminal: **>>truffle compile** and then **>>truffle migrate**
+3. run user interface in the third terminal: **>>cd client** and then **>>npm run start**
 4. See Home webpage in your broswer after few seconds. It starts data exchange in the DR page firstly. 
