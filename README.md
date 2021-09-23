@@ -1,4 +1,4 @@
-# BRESPE
+# README
 This demo contributes healthcare data secure sharing in privacy protection using public blockchains and sticky policy. It invovles frameworks react, webpack and truffle. With `BRESPE`, you can have user interfaces to operate data sharing in the Ethereum as a user `data subject` or `data controller` or `data requestor`. Learn more about React:https://www.trufflesuite.com/boxes/react , Webpack:https://www.trufflesuite.com/boxes/webpack , Truffle: https://www.trufflesuite.com and Ethereum: https://ethereum.org/en/ .
 ## How to run
 ### Installation for react box or see steps from https://www.trufflesuite.com/boxes/react or https://github.com/truffle-box/react-box
@@ -14,3 +14,9 @@ command: **>>compile** and **>>migrate**
 6. In the `client` directory, we run the React app in another terminal. Smart contract changes must be manually recompiled and migrated.
 command: **>>cd client** and then **>>npm run start**
 7. You will see a user interface (webpage) running in your broswer shown as `localhost:3000`.
+### Check configuration for Ethereum
+1. Ensure you configures environment for run `Ethereum` with `Ganache-cli` or `testrpc`
+2. install `testrpc`: **>>npm install -g ethereumjs-testrpc**
+3. alternative step2 with install `Ganache-cli`: **>>npm install -g ganache-cli**
+4. Run testRPC/ganache-cli to connect Ethereum in another terminal: **>>testrpc** or **>>ganache-cli**
+### Add codes into the `react`
