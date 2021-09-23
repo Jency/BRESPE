@@ -2,10 +2,11 @@
 This demo contributes healthcare data secure sharing in privacy protection using public blockchains and sticky policy. It invovles frameworks react, webpack and truffle. With `BRESPE`, you can have user interfaces to operate data sharing in the Ethereum as a user `data subject` or `data controller` or `data requestor`. Learn more about React:https://www.trufflesuite.com/boxes/react , Webpack:https://www.trufflesuite.com/boxes/webpack , Truffle: https://www.trufflesuite.com and Ethereum: https://ethereum.org/en/ .
 ## How to run
 ### Check configuration for Ethereum
-1. Ensure you configures environment for run `Ethereum` with `Ganache-cli` or `testrpc`
-2. install `testrpc`: **>>npm install -g ethereumjs-testrpc**
-3. alternative step2 with install `Ganache-cli`: **>>npm install -g ganache-cli**
-4. Run testRPC/ganache-cli to connect Ethereum in a terminal: **>>testrpc** or **>>ganache-cli**
+1. Ensure you configures environment for run `Ethereum` 
+2. check geth client `Ganache-cli` or `testrpc`, if no client, see step 3
+3. install `testrpc`: **>>npm install -g ethereumjs-testrpc**
+4. alternative step2 with install `Ganache-cli`: **>>npm install -g ganache-cli**
+5. Run testRPC/ganache-cli to connect Ethereum in a terminal: **>>testrpc** or **>>ganache-cli**
 ### Installation `react` box into your empty directory or see steps from https://www.trufflesuite.com/boxes/react or https://github.com/truffle-box/react-box
 1. First run the second terminal and ensure you are in a new and empty directory.
 2. Run the `unbox` command via `npx` and skip to step 3. This will install all necessary dependencies. A Create-React-App is generated in the `client` directory.
