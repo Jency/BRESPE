@@ -2,6 +2,13 @@
 pragma solidity >=0.4.21 <0.7.0;
 contract SimpleStorage {
 //request
+
+  struct Number {
+    uint b_count;
+    uint b_number;
+  }
+  Number[] public number;
+
   string[] public condition=new string[](0);
   string[] public nameDO = new string[](0);
   string[] public nameRqP = new string[](0);
@@ -70,8 +77,20 @@ contract SimpleStorage {
       startDate.push(_startDate);
       expired.push(_expired);
       status.push(_status);
+
+      number.push(Number(condition.length, block.number)) ;
     }
   }
+  //get blocknumber
+  function showBlockNumber (uint _number) public view returns (uint) {
+    for(uint i=0;i<condition.length;i++){
+      Number storage myNumber = number[i];
+      if(_number == myNumber.b_count){
+        return myNumber.b_number;
+      }
+    } return 0;
+  }
+
   //get content of request
   function getCondition(uint index) view public returns(string memory){
     return (condition[index]);
