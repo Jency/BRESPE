@@ -6,7 +6,7 @@ import sha3 from "js-sha3";
 import "./App.css";
 
 class dr extends Component {
-    state = {storageValue:0, conditions:[], number:0, c_conditions:[], total:0, s_conditions:[], count:0, hashes:[], web3:null, accounts:null, contract:null};
+    state = {myBlockNumber:[], myBlockHash:[], block_number:[], storageValue:0, conditions:[], number:0, c_conditions:[], total:0, s_conditions:[], count:0, hashes:[], web3:null, accounts:null, contract:null};
 
     componentDidMount = async () => {
         try {
@@ -23,9 +23,20 @@ class dr extends Component {
                 deployedNetwork && deployedNetwork.address
             );
 
+            const myblock_Number = await web3.eth.getBlockNumber();
+            //const h = (await web3.eth.getBlock(4)).hash;
+            //alert(`block number is` +myblock_Number);
+            //alert(h);
+            const {myBlockHash} = this.state;
+            for (var i =0; i<myblock_Number;i++){
+                myBlockHash[i] = (await web3.eth.getBlock(i)).hash;
+                //alert(myBlockHash[i]);
+            }
+
+
             // Set web3, accounts, and contract to the state, and then proceed with an
             // example of interacting with the contract's methods.
-            this.setState({ web3, accounts, contract: instance }, this.readRequest);
+            this.setState({ web3, accounts, contract: instance, myBlockNumber: myblock_Number, myBlockHash: myBlockHash}, this.readRequest);
 
         } catch (error) {
             // Catch any errors for any of the above operations.
@@ -37,12 +48,14 @@ class dr extends Component {
     };
 
     readRequest = async () => {
-        const { s_conditions, c_conditions, hashes, conditions,contract} = this.state;
+        const { s_conditions, c_conditions, hashes, conditions,contract, block_number} = this.state;
 
         const response1=await contract.methods.getConditionsCount().call();
         const response2=await contract.methods.getC_conditionsCount().call();
         const response3=await contract.methods.getS_conditionsCount().call();
         const response4=await contract.methods.getHashCount().call();
+
+
 
         for (var i = 0; i < Number(response1); i++) {
 
@@ -55,6 +68,8 @@ class dr extends Component {
             element1.expired=await contract.methods.getExpired(i).call();
             element1.status=await contract.methods.getStatus(i).call();
             conditions[i]=element1;
+
+            block_number[i] = await contract.methods.showBlockNumber(i+1).call();
         }
         for (var n = 0; n < Number(response2); n++) {
 
@@ -87,9 +102,13 @@ class dr extends Component {
             element4.hash=await contract.methods.getHash(k).call();
             hashes[k]=element4;
         }
-        this.setState({ storageValue: Number(response1),conditions: conditions, number:Number(response2), c_conditions:c_conditions, total:Number(response3), s_conditions:s_conditions,count:Number(response4),hashes:hashes});
+        this.setState({block_number: block_number, storageValue: Number(response1),conditions: conditions, number:Number(response2), c_conditions:c_conditions, total:Number(response3), s_conditions:s_conditions,count:Number(response4),hashes:hashes});
 
     };
+
+
+
+
   render() {
 
     return (
@@ -102,20 +121,20 @@ class dr extends Component {
           <ul>{
               this.state.c_conditions.map((c,n)=>{
                   return <li key={n}>
-                      From:{c.nameDO}   To: {c.nameRqP} Purpose:{c.purpose}
-                      Authorized Start Date:{c.startDate} Authorized Expired: {c.expired}
-                      Conditions: {c.condition} Authorized Status:{c.status}  Data Location:{c.nameRO}
+                      Data Subject:{c.nameDO}/   Data Requester: {c.nameRqP}/ Purpose:{c.purpose}/
+                      Authorized Start Date:{c.startDate}/ Authorized Expired: {c.expired}/
+                      Conditions: {c.condition}/ Authorized Status:{c.status}/  Data Controller:{c.nameRO}
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
                           let receipt ={
-                              to:c.nameRqP,
-                              from:c.nameDO,
+                              dataRequester:c.nameRqP,
+                              dataSubject:c.nameDO,
                               purpose:c.purpose,
                               authorizedStart:c.startDate,
                               end:c.expired,
                               condition:c.condition,
                               status:c.status,
-                              atLocation:c.nameRO
+                              dataController:c.nameRO
                           };
                           let hash=sha3.sha3_512(receipt.toString());
                           let f = {receipt:receipt, hashOfReceipt:hash};
@@ -132,21 +151,21 @@ class dr extends Component {
           <ul>{
               this.state.s_conditions.map((s,m)=>{
                   return <li key={m}>
-                      Data Subject:{s.nameDO}  Resource Owner:{s.nameRO}  To: {s.nameRqP}
-                      Purpose:{s.purpose}
-                      Start Date:{s.startDate} Expired: {s.expired}
-                      Conditions: {s.condition} Authorized Status:{s.status}
+                      Data Subject:{s.nameDO}/  Data Controller:{s.nameRO}/  Data Requester:{s.nameRqP}/
+                      Purpose:{s.purpose}/
+                      Start Date:{s.startDate}/ Expired: {s.expired}/
+                      Conditions: {s.condition}/ Authorized Status:{s.status}/
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
                           let receipt ={
-                              requestingParty:s.nameRqP,
+                              dataRequester:s.nameRqP,
                               dataSubject:s.nameDO,
                               purpose:s.purpose,
                               start:s.startDate,
                               end:s.expired,
                               condition:s.condition,
                               AuthorizedStatus:s.status,
-                              resourceOwner:s.nameRO
+                              dataController:s.nameRO
                           };
                           let hash=sha3.sha3_512(receipt.toString());
                           let f = {receipt:receipt, hashOfReceipt:hash};
@@ -179,49 +198,26 @@ class dr extends Component {
           }
           </ul>
 
-
-          <h3>Send Request</h3>
-          <div align="center">
-          <input placeholder="From" type="text" id="from" required="required" style={{width:200,height:20}}/>
-          <input placeholder="To" type="text" id="to" required="required" style={{width:200,height:20}}/>
-          <input placeholder="Purpose:read/update/delete/add/all" type="text" id="policyPurpose" required="required" style={{width:200,height:20}}/>
-          <input placeholder="Expected start date" type="text" id="policyStart" required="required" style={{width:200,height:20}}/>
-          <input placeholder="Expired date" type="text" id="policyExpired" required="required" style={{width:200,height:20}}/>
-          <input placeholder="conditions" type="text" id="conditions" required="required" style={{width:200,height:60}}/>
-          </div>
-          <button onClick={async ()=>{
-              let value1=document.getElementById("conditions").value;
-              let value2=document.getElementById("from").value;
-              let value3=document.getElementById("to").value;
-              let value4=document.getElementById("policyPurpose").value;
-              let value5=document.getElementById("policyStart").value;
-              let value6=document.getElementById("policyExpired").value;
-              let value7="Null";
-              const {storageValue,conditions,accounts,contract } = this.state;
-
-              await contract.methods.addRequest(value1, value3, value2, value4, value5,value6,value7).send({from:accounts[0],gas: 555555});
-              var e={condition:value1,nameDO: value3, nameRqP:value2, purpose:value4,startDate:value5, expired:value6, status:value7};
-              conditions[conditions.length]=e;
-              this.setState({storageValue: storageValue+1,conditions: conditions});
-          }}>Send</button>
-
           <h3>My Receipts</h3>
           <ul>{
               this.state.conditions.map((r,i)=>{
                   return <li key={i}>
-                      ID: {i+1}  Content: {r.nameRqP+" wants to "+r.purpose+" EHR of "+r.nameDO+" between "+r.startDate+" and "+r.expired+" with conditions "+r.condition+" that is "+r.status}
+                      ID: {i+1}/ BlockNumber: {this.state.block_number[i]}/ BlockHash: {this.state.myBlockHash[(this.state.block_number[i])-1]}/
+                      Content: {"dataRequester:"+r.nameRqP+",Purpose:"+r.purpose+",dataSubject:"+r.nameDO+",startDate:"+r.startDate+",Expired:"+r.expired+",Conditions:"+r.condition+",Status:"+r.status}
 
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
                           let receipt ={
-                              from:r.nameRqP,
-                              to:r.nameDO,
+                              blockId:this.state.block_number[i],
+                              blockHash:this.state.myBlockHash[(this.state.block_number[i])-1],
+                              dataRequester:r.nameRqP,
+                              dataSubject:r.nameDO,
                               purpose:r.purpose,
-                              start:r.startDate,
-                              end:r.expired,
+                              startDate:r.startDate,
+                              expired:r.expired,
                               condition:r.condition,
                               status:r.status,
-                              nameRO:"Null"
+                              dataController:"Null"
                           };
                           let hash=sha3.sha3_512(receipt.toString());
                           let f = {receipt:receipt, hashOfReceipt:hash};
@@ -233,6 +229,89 @@ class dr extends Component {
           }
           </ul>
 
+          <h3>Send Request</h3>
+          <table align="center">
+              <tr>
+                  <td></td>
+                  <td align="left">Welcome back,Alice</td>
+              </tr>
+              <tr align="left">
+                  <td>To:</td>
+                  <td>
+                      <input type="text" name="myTo" id="myTo" list="to" placeholder="select or input"/>
+                      <datalist name="to" id="to" >
+                          <option value="John Martin" id="1">John Martin</option>
+                          <option value="Mike Burton" id="2">Mike Burton</option>
+                          <option value="Bob Ying" id="3">Bob Ying</option>
+                          <option value="Rebecca Wood" id="4">Rebecca Wood</option>
+                      </datalist>
+
+                  </td>
+              </tr>
+              <tr align="left">
+                  <td>Purpose:</td>
+                  <td>
+                      <table border="0">
+                          <tr style={{border:0, margin:0}}>
+                              <td><input value="read" type="radio" id="policyPurpose" name="policyPurpose" checked="checked"/>read</td>
+                              <td><input value="update" type="radio" id="policyPurpose" name="policyPurpose" />update</td>
+                              <td><input value="delete" type="radio" id="policyPurpose" name="policyPurpose" />delete</td>
+                              <td><input value="add" type="radio" id="policyPurpose" name="policyPurpose" />add</td>
+                              <td><input value="all" type="radio" id="policyPurpose" name="policyPurpose" />all</td>
+                          </tr>
+                      </table>
+                  </td>
+
+              </tr>
+              <tr align="left">
+                  <td>StartDate:</td>
+                  <td><input type="text" id="policyStart" required="required" placeholder="MM-DD-YYYY"/></td>
+              </tr>
+              <tr align="left">
+                  <td>Expired:</td>
+                  <td><input type="text" id="policyExpired" required="required" placeholder="MM-DD-YYYY"/></td>
+              </tr>
+              <tr align="left">
+                  <td>Conditions:</td>
+                  <td><input type="text" id="conditions" required="required"/></td>
+              </tr>
+
+              <tr>
+                  <td></td>
+                  <td align="left">
+                      <button onClick={async ()=>{
+                          let value1=document.getElementById("conditions").value;
+                          let value2 = "Alice";
+                          //let value2=document.getElementById("from").value;
+                          //let value3=document.getElementById("to").value;
+
+                          //alert(document.getElementById("myTo").value);
+                          let value3 = document.getElementById("myTo").value;
+
+                          let value4;
+                          var obj = document.getElementsByName("policyPurpose");
+                          for (var i=0;i<obj.length;i++){
+                              if(obj[i].checked){
+                                  //alert(obj[i].value);
+                                  value4 = obj[i].value;
+                              }
+                          }
+
+                          let value5=document.getElementById("policyStart").value;
+                          let value6=document.getElementById("policyExpired").value;
+                          let value7="Null";
+                          const {storageValue,conditions,accounts,contract } = this.state;
+
+                          await contract.methods.addRequest(value1, value3, value2, value4, value5,value6,value7).send({from:accounts[0],gas: 555555});
+                          var e={condition:value1,nameDO: value3, nameRqP:value2, purpose:value4,startDate:value5, expired:value6, status:value7};
+                          conditions[conditions.length]=e;
+                          this.setState({storageValue: storageValue+1,conditions: conditions});
+                      }}>Send</button>
+                  </td>
+              </tr>
+
+
+          </table>
       </div>
     );
   };
