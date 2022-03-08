@@ -1,12 +1,15 @@
-import React, { Component } from "react";
+import React, { Component} from "react";
+
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
 
 import sha3 from "js-sha3";
 import "./App.css";
 
+
+
 class ds extends Component {
-    state = {storageValue:0, conditions:[], number:0, c_conditions:[], count:0, hashes:[], web3:null, accounts:null, contract:null};
+    state = {display_name: "none",storageValue:0, conditions:[], number:0, c_conditions:[], count:0, hashes:[], web3:null, accounts:null, contract:null};
 
     componentDidMount = async () => {
         try {
@@ -39,11 +42,11 @@ class ds extends Component {
     readConsent = async () => {
         const { c_conditions, conditions,hashes,contract} = this.state;
 
-        const response1=await contract.methods.getConditionsCount().call();
-        const response2=await contract.methods.getC_conditionsCount().call();
+        const response1=await contract.methods.getConditionsCount().call(); // for request
+        const response2=await contract.methods.getC_conditionsCount().call(); // for consent
 
         //const response3=await contract.methods.getS_conditionsCount().call();
-        const response4=await contract.methods.getHashCount().call();
+        const response4=await contract.methods.getHashCount().call();  // for hash
 
         for (var i = 0; i < Number(response1); i++) {
 
@@ -84,7 +87,48 @@ class ds extends Component {
         this.setState({ storageValue: Number(response1), number:Number(response2),conditions: conditions, c_conditions:c_conditions, count:Number(response4),hashes:hashes});
 
     };
+    constructor(props) {
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.rqpFrom = React.createRef();
+        this.doTo = React.createRef();
+        this.expectStart = React.createRef();
+        this.expectedEnd = React.createRef();
+        this.myPurpose = React.createRef();
+        this.myCondition = React.createRef();
+        this.myStatus = React.createRef();
+        this.myRO = React.createRef();
+    }
+    handleSubmit= async (event) => {
+        alert(`you input is FROM` + this.rqpFrom.current.value + `/TO`+ this.doTo.current.value +`/START` +this.expectStart.current.value + `/END`+this.expectedEnd.current.value
+        + `/PURPOSE`+this.myPurpose.current.value+`/CONDITIONS`+this.myCondition.current.value + `/STATUS`+this.myStatus.current.value + `/CONTROLLER`+this.myRO.current.value);
+        event.preventDefault();
+        let value1=this.myCondition.current.value;
+        let value2=this.doTo.current.value;
+        let value3=this.rqpFrom.current.value;
+        let value4=this.myPurpose.current.value;
+        let value5=this.expectStart.current.value;
+        let value6=this.expectedEnd.current.value;
+        let value7=this.myStatus.current.value;
+        let value8=this.myRO.current.value;
+        if(value1 !=="" && value2 !=="" && value3 !=="" && value4 !=="" && value5 !=="" && value6 !=="" && value7 !== "") {
+        const {number,c_conditions,accounts,contract } = this.state;
 
+        await contract.methods.addConsent(value1, value2, value3, value4, value5,value6, value7, value8).send({from:accounts[0],gas: 555555});
+        var element={condition:value1, nameDO: value2, nameRqP:value3, purpose:value4,startDate:value5, expired:value6, status:value7, nameRO:value8};
+        c_conditions[c_conditions.length]=element;
+        this.setState({number: number+1,c_conditions: c_conditions});
+         }
+         else {
+         alert(`all filed are required.`,);
+        }
+
+    };
+
+    displayMe() {
+        if (this.state.display_name === "none"){this.setState({display_name: "block",})}
+        else if (this.state.display_name ==="block"){this.setState({display_name: "none",})}
+    };
 
 
     render() {
@@ -94,14 +138,53 @@ class ds extends Component {
                 <h2>DS Page</h2>
 
                 <h3>Requests</h3>
-                <div>count of requests from DR: {this.state.storageValue}</div>
+                <div>numbers of requests from DR: {this.state.storageValue}</div>
+
+                <div style={{float:'center', display:this.state.display_name}}>
+                    <table bgcolor="#ffebcd">
+                        <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>StartDate* (MM-DD-YYYY)</th>
+                            <th>Expired* (MM-DD-YYYY)</th>
+                            <th>Purpose*</th>
+                            <th>Conditions*</th>
+                            <th>Status*</th>
+                            <th>Data Controller*</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            this.state.conditions.map((person,i)=>{
+                                return <tr key={i}>
+                                    <td><input readOnly="readOnly"  id="from" required="required" type="text" value={person.nameRqP} ref={this.rqpFrom}/></td>
+                                    <td><input readOnly="readOnly"  id="to" required="required" type="text" value={person.nameDO} ref={this.doTo}/></td>
+                                    <td><input id="start" required="required" type="text" defaultValue={person.startDate} ref={this.expectStart}/></td>
+                                    <td><input id="expired" required="required" type="text" defaultValue={person.expired} ref={this.expectedEnd}/></td>
+                                    <td><input id="purpose" required="required" type="text" defaultValue={person.purpose} ref={this.myPurpose}/></td>
+                                    <td><input id="conditions" required="required" type="text" defaultValue={person.condition} ref={this.myCondition}/></td>
+                                    <td><input id="status" required="required" type="text" defaultValue="authorized" ref={this.myStatus}/></td>
+                                    <td><input id="nameRO" required="required" type="text" defaultValue="Null" ref={this.myRO}/></td>
+
+                                    <td>
+                                        <button onClick={this.handleSubmit.bind(this)}>consent</button>
+                                    </td>
+                                </tr>
+                            })
+                        } </tbody>
+
+                    </table>
+                </div>
+                <div><button onClick={this.displayMe.bind(this)}>View Details</button>
                 <ul>{
                     this.state.conditions.map((person,i)=>{
                         return <li key={i}>
-                            From: {person.nameRqP}  To:{person.nameDO}
-                            Expected Start Date:{person.startDate} Purpose:{person.purpose}
-                            Expected Expired: {person.expired}  Conditions: {person.condition}
-                            Status:{person.status} Data Location:{"Null"}
+                            DataRequester: {person.nameRqP}/  DataSubject:{person.nameDO}/
+                            Expected Start Date:{person.startDate}/
+                            Expected Expired: {person.expired}/
+                            Status:{person.status}
                             <button onClick={async ()=>{
                                 let value1=person.condition;
                                 let value2=person.nameDO;
@@ -117,20 +200,22 @@ class ds extends Component {
                                 var element={condition:value1, nameDO: value2, nameRqP:value3, purpose:value4,startDate:value5, expired:value6, status:value7, nameRO:value8};
                                 c_conditions[c_conditions.length]=element;
                                 this.setState({number: number+1,c_conditions: c_conditions});
-                            }}>Consent</button></li>
+                            }}>Consent</button>
+                        </li>
                     })
                 }
                 </ul>
+                </div>
 
                 <h3>My Consent</h3>
-                <div>count of consents: {this.state.number}</div>
+                <div>numbers of consents: {this.state.number}</div>
                 <ul>{
                     this.state.c_conditions.map((c,n)=>{
                         return <li key={n}>
-                            To: {c.nameRqP}  From:{c.nameDO}
-                            Authorized Start Date:{c.startDate} Purpose:{c.purpose}
-                            Authorized Expired: {c.expired}  Conditions: {c.condition}
-                            Authorized Status:{c.status} Data Location:{c.nameRO}
+                            Data Requester: {c.nameRqP}/  Data Subject:{c.nameDO}/
+                            Authorized Start Date:{c.startDate}/ Purpose:{c.purpose}/
+                            Authorized Expired: {c.expired}/  Conditions: {c.condition}/
+                            Authorized Status:{c.status}/ Data Controller:{c.nameRO}
                             </li>
                     })
                 }
@@ -140,19 +225,19 @@ class ds extends Component {
                 <ul>{
                     this.state.c_conditions.map((person,m)=>{
                         return <li key={m}>
-                            ID: {m+1}  Content: {person.nameDO+" authorised "+person.nameRqP+" to "+person.purpose+" EHR of "+person.nameDO+" from "+person.nameRO+" between "+person.startDate+" and "+person.expired+" with conditions "+person.condition+" that is "+person.status}
+                            ID: {m+1}/  Content: {"dataSubject:"+person.nameDO+",dataRequester:"+person.nameRqP+",Purpose:"+person.purpose+",Start from:"+person.startDate+",Expired:"+person.expired+",Conditions:"+person.condition+",Status:"+person.status}
 
                             <button onClick={async ()=>{
                                 var FileSaver = require("file-saver");
                                 let receipt ={
-                                    to:person.nameRqP,
-                                    from:person.nameDO,
+                                    dataRequester:person.nameRqP,
+                                    dataSubject:person.nameDO,
                                     purpose:person.purpose,
-                                    start:person.startDate,
-                                    end:person.expired,
+                                    startDate:person.startDate,
+                                    expired:person.expired,
                                     condition:person.condition,
                                     status:person.status,
-                                    atLocation:person.nameRO
+                                    dataController:person.nameRO
                                 };
                                 let hash=sha3.sha3_512(receipt.toString());
                                 let f = {receipt:receipt, hashOfReceipt:hash};
@@ -164,33 +249,7 @@ class ds extends Component {
                 }
                 </ul>
 
-                <h3>New Consent</h3>
-                <div align="center">
-                <input placeholder="From" type="text" id="from" required="required" style={{width:200,height:20}}/>
-                <input placeholder="To" type="text" id="to" required="required" style={{width:200,height:20}}/>
-                <input placeholder="Purpose:read/update/delete/add/all" required="required" type="text" id="purpose" style={{width:200,height:20}}/>
-                <input placeholder="Expected start date" type="text" id="start" required="required" style={{width:200,height:20}}/>
-                <input placeholder="Expired date" type="text" id="expired" required="required" style={{width:200,height:20}}/>
-                <input placeholder="conditions" type="text" id="conditions" required="required" style={{width:200,height:60}}/>
-                <input placeholder="status:authorized/rejected" type="text" id="status" required="required" style={{width:200,height:20}}/>
-                <input placeholder="Data location/data controller" type="text" id="nameRO" required="required" style={{width:200,height:20}}/>
-                </div>
-                <button onClick={async ()=>{
-                    let value1=document.getElementById("conditions").value;
-                    let value2=document.getElementById("from").value;
-                    let value3=document.getElementById("to").value;
-                    let value4=document.getElementById("purpose").value;
-                    let value5=document.getElementById("start").value;
-                    let value6=document.getElementById("expired").value;
-                    let value7=document.getElementById("status").value;
-                    let value8=document.getElementById("nameRO").value;
-                    const {number,c_conditions,accounts,contract } = this.state;
 
-                    await contract.methods.addConsent(value1, value2, value3, value4, value5,value6,value7,value8).send({from:accounts[0],gas: 555555});
-                    var e={condition:value1, nameDO: value2, nameRqP:value3, purpose:value4,startDate:value5, expired:value6, status:value7, nameRO:value8};
-                    c_conditions[c_conditions.length]=e;
-                    this.setState({number: number+1,c_conditions: c_conditions});
-                }}>Send</button>
 
                 <h3>History of Hash Values of Exchanged Data</h3>
                 <div>numbers of values shared by DC: {this.state.count}</div>
