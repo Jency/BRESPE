@@ -89,25 +89,25 @@ class dc extends Component {
                 <h2>DC Page</h2>
 
                 <h3>Consent</h3>
-                <div>count of consent from DS: {this.state.number}</div>
+                <div>numbers of consents from DS: {this.state.number}</div>
                 <ul>{
                     this.state.c_conditions.map((c,n)=>{
                         return <li key={n}>
-                            To: {c.nameRqP}  From:{c.nameDO}
-                            Authorized Start Date:{c.startDate} Purpose:{c.purpose}
-                            Authorized Expired: {c.expired}  Conditions: {c.condition}
-                            Authorized Status:{c.status} Data Location:{c.nameRO}
+                            Data Requester: {c.nameRqP}/  Data Subject:{c.nameDO}/
+                            Authorized Start Date:{c.startDate}/ Purpose:{c.purpose}/
+                            Authorized Expired: {c.expired}/  Conditions: {c.condition}/
+                            Authorized Status:{c.status}/ Data Controller:{c.nameRO}
                             <button onClick={async ()=>{
                                 var FileSaver = require("file-saver");
                                 let receipt ={
-                                    to:c.nameRqP,
-                                    from:c.nameDO,
+                                    dataRequester:c.nameRqP,
+                                    dataSubject:c.nameDO,
                                     purpose:c.purpose,
                                     authorizedStart:c.startDate,
-                                    end:c.expired,
+                                    expired:c.expired,
                                     condition:c.condition,
                                     status:c.status,
-                                    atLocation:c.nameRO
+                                    dataController:c.nameRO
                                 };
                                 let hash=sha3.sha3_512(receipt.toString());
                                 let f = {receipt:receipt, hashOfReceipt:hash};
@@ -124,25 +124,28 @@ class dc extends Component {
                 <ul>{
                     this.state.s_conditions.map((person,i)=>{
                         return <li key={i}>
-                            To: {person.nameRqP}  Data Subject:{person.nameDO} Resource Owner:{person.nameRO}
-                            Start Date:{person.startDate} Purpose:{person.purpose}
-                            Expired: {person.expired}  Conditions: {person.condition}
+                            Data Requester: {person.nameRqP}/  Data Subject:{person.nameDO}/ Data Controller:{person.nameRO}/
+                            Start Date:{person.startDate}/ Purpose:{person.purpose}/
+                            Expired: {person.expired}/  Conditions: {person.condition}/
                             Authorized Status:{person.status}
                             </li>
                     })
                 }
                 </ul>
 
-                <h3>New Sticky Policy</h3>
+                <h3>Create Sticky Policy</h3>
                 <div align="center">
                 <input placeholder="DataRequester" type="text" id="rqp" required="required" style={{width:200,height:20}}/>
                 <input placeholder="DataSubject" type="text" id="ds" required="required" style={{width:200,height:20}}/>
+
                 <input placeholder="Purpose:read/update/delete/add/all" type="text" id="policyPurpose" required="required" style={{width:200,height:20}}/>
-                <input placeholder="start date" type="text" id="policyStart" required="required" style={{width:200,height:20}}/>
-                <input placeholder="Expired date" type="text" id="policyExpired" required="required" style={{width:200,height:20}}/>
+
+
+                <input placeholder="start date MM-DD-YYYY" type="text" id="policyStart" required="required" style={{width:200,height:20}}/>
+                <input placeholder="Expired date MM-DD-YYYY" type="text" id="policyExpired" required="required" style={{width:200,height:20}}/>
                 <input placeholder="conditions" type="text" id="conditions" required="required" style={{width:200,height:60}}/>
-                <input placeholder="status" type="text" id="status" required="required" style={{width:200,height:20}}/>
-                <input placeholder="Data location/data controller" type="text" id="nameRO" required="required" style={{width:200,height:20}}/>
+
+                <input placeholder="Data controller" type="text" id="nameRO" required="required" style={{width:200,height:20}}/>
                 </div>
                 <button onClick={async ()=>{
                     let value1=document.getElementById("conditions").value;
@@ -151,7 +154,8 @@ class dc extends Component {
                     let value4=document.getElementById("policyPurpose").value;
                     let value5=document.getElementById("policyStart").value;
                     let value6=document.getElementById("policyExpired").value;
-                    let value7=document.getElementById("status").value;
+                    //let value7=document.getElementById("status").value;
+                    let value7="authorized";
                     let value8=document.getElementById("nameRO").value;
                     const {total,s_conditions,accounts,contract } = this.state;
 
@@ -162,7 +166,7 @@ class dc extends Component {
                 }}>Send</button>
 
                 <h3>Hash Value of Required Data</h3>
-                <div align="center"><input placeholder="hash" type="text" id="hash" required="required" style={{width:400,height:20}}/></div>
+                <div align="center"><input placeholder="input hash" type="text" id="hash" required="required" style={{width:400,height:20}}/></div>
                 <button onClick={async ()=>{
                     let value1=document.getElementById("hash").value;
                     const {count,hashes,accounts,contract } = this.state;
@@ -178,19 +182,19 @@ class dc extends Component {
                 <ul>{
                     this.state.s_conditions.map((person,i)=>{
                         return <li key={i}>
-                            ID: {i+1}  Sticky Policy: {"Resource Owner "+person.nameRO+" verified that "+person.nameRqP+" can "+person.purpose+" EHR of "+person.nameDO+" from "+person.nameRO+" between "+person.startDate+" and "+person.expired+" with conditions "+person.condition+" that is "+person.status}
+                            ID: {i+1}/  Sticky Policy: {"dataController:"+person.nameRO+",dataRequester:"+person.nameRqP+",purpose:"+person.purpose+",dataSubject:"+person.nameDO+",startDate:"+person.startDate+",expired:"+person.expired+",conditions:"+person.condition+",status:"+person.status}
 
                             <button onClick={async ()=>{
                                 var FileSaver = require("file-saver");
                                 let receipt ={
-                                    requestingParty:person.nameRqP,
+                                    dataRequesterter:person.nameRqP,
                                     dataSubject:person.nameDO,
                                     purpose:person.purpose,
                                     start:person.startDate,
                                     end:person.expired,
                                     condition:person.condition,
                                     status:person.status,
-                                    resourceOwner:person.nameRO
+                                    dataController:person.nameRO
                                 };
                                 let hash=sha3.sha3_512(receipt.toString());
                                 let f = {receipt:receipt, hashOfReceipt:hash};
@@ -205,7 +209,7 @@ class dc extends Component {
                 <ul>{
                     this.state.hashes.map((h,m)=>{
                         return <li key={m}>
-                            ID: {m+1}  Content: {"The hash of data required is "+h.hash+"."}
+                            ID: {m+1}/  Content of hash: {h.hash}
 
                             <button onClick={async ()=>{
                                 var FileSaver = require("file-saver");
