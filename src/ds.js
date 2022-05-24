@@ -96,12 +96,12 @@ class ds extends Component {
         this.expectedEnd = React.createRef();
         this.myPurpose = React.createRef();
         this.myCondition = React.createRef();
-        this.myStatus = React.createRef();
+        //this.myStatus = React.createRef();
         this.myRO = React.createRef();
     }
     handleSubmit= async (event) => {
-        alert(`you input is FROM` + this.rqpFrom.current.value + `/TO`+ this.doTo.current.value +`/START` +this.expectStart.current.value + `/END`+this.expectedEnd.current.value
-        + `/PURPOSE`+this.myPurpose.current.value+`/CONDITIONS`+this.myCondition.current.value + `/STATUS`+this.myStatus.current.value + `/CONTROLLER`+this.myRO.current.value);
+        alert(`you input is FROM:` + this.rqpFrom.current.value + `/TO:`+ this.doTo.current.value +`/START:` +this.expectStart.current.value + `/END:`+this.expectedEnd.current.value
+        + `/PURPOSE:`+this.myPurpose.current.value+`/CONDITIONS:`+this.myCondition.current.value + `/CONTROLLER:`+this.myRO.current.value);
         event.preventDefault();
         let value1=this.myCondition.current.value;
         let value2=this.doTo.current.value;
@@ -109,7 +109,8 @@ class ds extends Component {
         let value4=this.myPurpose.current.value;
         let value5=this.expectStart.current.value;
         let value6=this.expectedEnd.current.value;
-        let value7=this.myStatus.current.value;
+        //let value7=this.myStatus.current.value;
+        let value7="authorized";
         let value8=this.myRO.current.value;
         if(value1 !=="" && value2 !=="" && value3 !=="" && value4 !=="" && value5 !=="" && value6 !=="" && value7 !== "") {
         const {number,c_conditions,accounts,contract } = this.state;
@@ -137,8 +138,7 @@ class ds extends Component {
             <div className="App">
                 <h2>DS Page</h2>
 
-                <h3>Requests</h3>
-                <div>numbers of requests from DR: {this.state.storageValue}</div>
+                <h3>List of Requests ({this.state.storageValue})</h3>
 
                 <div style={{float:'center', display:this.state.display_name}}>
                     <table bgcolor="#ffebcd">
@@ -146,11 +146,10 @@ class ds extends Component {
                         <tr>
                             <th>From</th>
                             <th>To</th>
-                            <th>StartDate* (MM-DD-YYYY)</th>
-                            <th>Expired* (MM-DD-YYYY)</th>
+                            <th>Start Date*</th>
+                            <th>Expired*</th>
                             <th>Purpose*</th>
-                            <th>Conditions*</th>
-                            <th>Status*</th>
+                            <th>Data Type*</th>
                             <th>Data Controller*</th>
                             <th>Actions</th>
                         </tr>
@@ -163,10 +162,35 @@ class ds extends Component {
                                     <td><input readOnly="readOnly"  id="to" required="required" type="text" value={person.nameDO} ref={this.doTo}/></td>
                                     <td><input id="start" required="required" type="text" defaultValue={person.startDate} ref={this.expectStart}/></td>
                                     <td><input id="expired" required="required" type="text" defaultValue={person.expired} ref={this.expectedEnd}/></td>
-                                    <td><input id="purpose" required="required" type="text" defaultValue={person.purpose} ref={this.myPurpose}/></td>
-                                    <td><input id="conditions" required="required" type="text" defaultValue={person.condition} ref={this.myCondition}/></td>
-                                    <td><input id="status" required="required" type="text" defaultValue="authorized" ref={this.myStatus}/></td>
-                                    <td><input id="nameRO" required="required" type="text" defaultValue="Null" ref={this.myRO}/></td>
+                                    <td>
+                                        <input id="purpose" required="required" type="text" list="myPurpose" defaultValue={person.purpose} ref={this.myPurpose}/>
+                                        <datalist name="myPurpose" id="myPurpose" >
+                                            <option value="read" id="1">read</option>
+                                            <option value="update" id="2">update</option>
+                                            <option value="delete" id="3">delete</option>
+                                            <option value="add" id="4">add</option>
+                                            <option value="all" id="5">all</option>
+                                        </datalist>
+                                    </td>
+
+                                    <td>
+                                        <input id="conditions" required="required" type="text" list="myConditions" defaultValue={person.condition} ref={this.myCondition}/>
+                                        <datalist name="myConditions" id="myConditions" >
+                                            <option value="allergies" id="1">allergies</option>
+                                            <option value="treatments and medicines" id="2">treatments and medicines</option>
+                                            <option value="EHRs" id="3">EHRs</option>
+                                            <option value="others" id="4">others</option>
+                                        </datalist>
+                                    </td>
+
+                                    <td>
+                                        <input ref={this.myRO} type="text" name="nameRO" id="nameRO" list="ro" required="required" placeholder="select or input"/>
+                                        <datalist name="ro" id="ro" >
+                                            <option value="Halcon Medical Centre" id="1">Halcon Medical Centre</option>
+                                            <option value="Summerfield Primary Care Centre" id="2">Summerfield Primary Care Centre</option>
+                                            <option value="Birmingham Treatment Centre" id="3">Birmingham Treatment Centre</option>
+                                        </datalist>
+                                    </td>
 
                                     <td>
                                         <button onClick={this.handleSubmit.bind(this)}>consent</button>
@@ -207,14 +231,14 @@ class ds extends Component {
                 </ul>
                 </div>
 
-                <h3>My Consent</h3>
-                <div>numbers of consents: {this.state.number}</div>
+                <h3>List of Consents ({this.state.number})</h3>
+
                 <ul>{
                     this.state.c_conditions.map((c,n)=>{
                         return <li key={n}>
                             Data Requester: {c.nameRqP}/  Data Subject:{c.nameDO}/
                             Authorized Start Date:{c.startDate}/ Purpose:{c.purpose}/
-                            Authorized Expired: {c.expired}/  Conditions: {c.condition}/
+                            Authorized Expired: {c.expired}/  Data Type: {c.condition}/
                             Authorized Status:{c.status}/ Data Controller:{c.nameRO}
                             </li>
                     })
@@ -225,7 +249,7 @@ class ds extends Component {
                 <ul>{
                     this.state.c_conditions.map((person,m)=>{
                         return <li key={m}>
-                            ID: {m+1}/  Content: {"dataSubject:"+person.nameDO+",dataRequester:"+person.nameRqP+",Purpose:"+person.purpose+",Start from:"+person.startDate+",Expired:"+person.expired+",Conditions:"+person.condition+",Status:"+person.status}
+                            ID: {m+1}/  Content: {"dataSubject:"+person.nameDO+",dataRequester:"+person.nameRqP+",Purpose:"+person.purpose+",Start from:"+person.startDate+",Expired:"+person.expired+",Data Type:"+person.condition+",Status:"+person.status}
 
                             <button onClick={async ()=>{
                                 var FileSaver = require("file-saver");
@@ -235,7 +259,7 @@ class ds extends Component {
                                     purpose:person.purpose,
                                     startDate:person.startDate,
                                     expired:person.expired,
-                                    condition:person.condition,
+                                    dataType:person.condition,
                                     status:person.status,
                                     dataController:person.nameRO
                                 };
@@ -251,8 +275,8 @@ class ds extends Component {
 
 
 
-                <h3>History of Hash Values of Exchanged Data</h3>
-                <div>numbers of values shared by DC: {this.state.count}</div>
+                <h3>Records of Hash Values of Exchanged Data ({this.state.count})</h3>
+
                 <ul>{
                     this.state.hashes.map((h,k)=>{
                         return <li key={k}>
