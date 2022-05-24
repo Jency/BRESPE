@@ -116,14 +116,14 @@ class dr extends Component {
           <h2>DR Page</h2>
 
 
-          <h3>My Consent</h3>
-          <div>numbers of consent from DS: {this.state.number}</div>
+          <h3>List of Consents ({this.state.number})</h3>
+
           <ul>{
               this.state.c_conditions.map((c,n)=>{
                   return <li key={n}>
                       Data Subject:{c.nameDO}/   Data Requester: {c.nameRqP}/ Purpose:{c.purpose}/
                       Authorized Start Date:{c.startDate}/ Authorized Expired: {c.expired}/
-                      Conditions: {c.condition}/ Authorized Status:{c.status}/  Data Controller:{c.nameRO}
+                      Date Type: {c.condition}/ Authorized Status:{c.status}/  Data Controller:{c.nameRO}
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
                           let receipt ={
@@ -132,7 +132,7 @@ class dr extends Component {
                               purpose:c.purpose,
                               authorizedStart:c.startDate,
                               end:c.expired,
-                              condition:c.condition,
+                              dataType:c.condition,
                               status:c.status,
                               dataController:c.nameRO
                           };
@@ -146,15 +146,15 @@ class dr extends Component {
           }
           </ul>
 
-          <h3>My Sticky Policies</h3>
-          <div>numbers of policies from DC: {this.state.total}</div>
+          <h3>List of Sticky Policies ({this.state.total})</h3>
+
           <ul>{
               this.state.s_conditions.map((s,m)=>{
                   return <li key={m}>
                       Data Subject:{s.nameDO}/  Data Controller:{s.nameRO}/  Data Requester:{s.nameRqP}/
                       Purpose:{s.purpose}/
                       Start Date:{s.startDate}/ Expired: {s.expired}/
-                      Conditions: {s.condition}/ Authorized Status:{s.status}/
+                      Data Type: {s.condition}/ Authorized Status:{s.status}/
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
                           let receipt ={
@@ -163,7 +163,7 @@ class dr extends Component {
                               purpose:s.purpose,
                               start:s.startDate,
                               end:s.expired,
-                              condition:s.condition,
+                              dataType:s.condition,
                               AuthorizedStatus:s.status,
                               dataController:s.nameRO
                           };
@@ -177,33 +177,13 @@ class dr extends Component {
           }
           </ul>
 
-          <h3>Hash Values of Required Data</h3>
-          <div>numbers of values from DC: {this.state.count}</div>
-          <ul>{
-              this.state.hashes.map((h,k)=>{
-                  return <li key={k}>
-                      Hash value of shared data:{h.hash}
-                      <button onClick={async ()=>{
-                          var FileSaver = require("file-saver");
-                          let receipt ={
-                              HashValue:h.hash
-                          };
-                          let hash=sha3.sha3_512(receipt.toString());
-                          let f = {receipt:receipt, hashOfReceipt:hash};
-                          var json = JSON.stringify(f);
-                          var blob = new Blob([json], {type: "text/plain;charest=utf-8"});
-                          FileSaver.saveAs(blob, "yourHash.json");
-                      }}>Download</button></li>
-              })
-          }
-          </ul>
 
           <h3>My Receipts</h3>
           <ul>{
               this.state.conditions.map((r,i)=>{
                   return <li key={i}>
-                      ID: {i+1}/ BlockNumber: {this.state.block_number[i]}/ BlockHash: {this.state.myBlockHash[(this.state.block_number[i])-1]}/
-                      Content: {"dataRequester:"+r.nameRqP+",Purpose:"+r.purpose+",dataSubject:"+r.nameDO+",startDate:"+r.startDate+",Expired:"+r.expired+",Conditions:"+r.condition+",Status:"+r.status}
+                      ID: {i+1}/
+                      Content: {"dataRequester:"+r.nameRqP+",Purpose:"+r.purpose+",dataSubject:"+r.nameDO+",startDate:"+r.startDate+",Expired:"+r.expired+",dataType:"+r.condition+",Status:"+r.status}
 
                       <button onClick={async ()=>{
                           var FileSaver = require("file-saver");
@@ -215,7 +195,7 @@ class dr extends Component {
                               purpose:r.purpose,
                               startDate:r.startDate,
                               expired:r.expired,
-                              condition:r.condition,
+                              dataType:r.condition,
                               status:r.status,
                               dataController:"Null"
                           };
@@ -238,7 +218,7 @@ class dr extends Component {
               <tr align="left">
                   <td>To:</td>
                   <td>
-                      <input type="text" name="myTo" id="myTo" list="to" placeholder="select or input"/>
+                      <input type="text" name="myTo" id="myTo" list="to" required="required" placeholder="select or input"/>
                       <datalist name="to" id="to" >
                           <option value="John Martin" id="1">John Martin</option>
                           <option value="Mike Burton" id="2">Mike Burton</option>
@@ -264,23 +244,35 @@ class dr extends Component {
 
               </tr>
               <tr align="left">
-                  <td>StartDate:</td>
-                  <td><input type="text" id="policyStart" required="required" placeholder="MM-DD-YYYY"/></td>
+                  <td>Data Type:</td>
+                  <td>
+                      <input type="text" name="myType" id="myType" list="conditions" required="required" placeholder="select or input"/>
+                      <datalist name="conditions" id="conditions" >
+                          <option value="allergies" id="1">allergies</option>
+                          <option value="treatments and medicines" id="2">treatments and medicines</option>
+                          <option value="EHRs" id="3">EHRs</option>
+                          <option value="others" id="4">others</option>
+                      </datalist>
+
+                  </td>
               </tr>
               <tr align="left">
-                  <td>Expired:</td>
-                  <td><input type="text" id="policyExpired" required="required" placeholder="MM-DD-YYYY"/></td>
+                  <td>Start Date:</td>
+                  <td><input type="date" name="policyStart" id="policyStart" min="1990-01-01" required="required"/></td>
+
               </tr>
               <tr align="left">
-                  <td>Conditions:</td>
-                  <td><input type="text" id="conditions" required="required"/></td>
+                  <td>Expired Date:</td>
+                  <td><input type="date" name="policyExpired" id="policyExpired" required="required" /></td>
               </tr>
 
               <tr>
                   <td></td>
                   <td align="left">
                       <button onClick={async ()=>{
-                          let value1=document.getElementById("conditions").value;
+                          //let value1=document.getElementById("conditions").value;
+                          let value1=document.getElementById("myType").value;
+
                           let value2 = "Alice";
                           //let value2=document.getElementById("from").value;
                           //let value3=document.getElementById("to").value;
@@ -298,7 +290,9 @@ class dr extends Component {
                           }
 
                           let value5=document.getElementById("policyStart").value;
+
                           let value6=document.getElementById("policyExpired").value;
+
                           let value7="Null";
                           const {storageValue,conditions,accounts,contract } = this.state;
 
@@ -309,9 +303,28 @@ class dr extends Component {
                       }}>Send</button>
                   </td>
               </tr>
-
-
           </table>
+
+          <h3>Hash Values of Required Data ({this.state.count})</h3>
+
+          <ul>{
+              this.state.hashes.map((h,k)=>{
+                  return <li key={k}>
+                      Hash value of shared data:{h.hash}
+                      <button onClick={async ()=>{
+                          var FileSaver = require("file-saver");
+                          let receipt ={
+                              HashValue:h.hash
+                          };
+                          let hash=sha3.sha3_512(receipt.toString());
+                          let f = {receipt:receipt, hashOfReceipt:hash};
+                          var json = JSON.stringify(f);
+                          var blob = new Blob([json], {type: "text/plain;charest=utf-8"});
+                          FileSaver.saveAs(blob, "yourHash.json");
+                      }}>Download</button></li>
+              })
+          }
+          </ul>
       </div>
     );
   };
