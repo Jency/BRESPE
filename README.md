@@ -7,6 +7,11 @@ This demo contributes healthcare data secure sharing in privacy protection using
 3. install `testrpc`: **>>npm install -g ethereumjs-testrpc**
 4. alternative step3 with install `Ganache-cli`: **>>npm install -g ganache-cli**
 5. Run testRPC/ganache-cli to connect Ethereum in a terminal: **>>testrpc** or **>>ganache-cli**
+6. configure the metamask to view more details in transactions with localhost network if you want 
+  6.1. add MetaMask extension in the Chrome or Firefox browser and then creat your metamask account. 
+  6.2 add localhost network into your metamask account: if localhost server is ganache-cli, network setting: `Networkname`: your localhost network name; `RPC URL`:http://127.0.0.1:8545; `chain id`: 1337;' if localhost server is ganache, `RPC URL`is http://127.0.0.1:7545, `chain id`is 1337.
+  6.3 import your blockchain account into the metamask wallet. We have 10 default accounts with 100 eths from localhost. To select and copy one private keys of accounts, and then import into the metamask: select the `import account`>>choose type `private key`>>paste `private key string` with private key from default accounts in the localhost >> create and save >> check the assets of this account.
+
 ### Installation `react` box into your empty directory or see steps from https://www.trufflesuite.com/boxes/react or https://github.com/truffle-box/react-box
 1. First run the second terminal and ensure you are in a new and empty directory.
 2. Run the `unbox` command via `npx` and skip to step 3. This will install all necessary dependencies. A Create-React-App is generated in the `client` directory.
